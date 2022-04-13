@@ -1,9 +1,12 @@
 package com.dicoding.picodiploma.loginwithanimation.view.login
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
@@ -33,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
         setupView()
         setupViewModel()
         setupAction()
+        playAnimation()
     }
 
     private fun setupView() {
@@ -54,9 +58,9 @@ class LoginActivity : AppCompatActivity() {
             ViewModelFactory(UserPreference.getInstance(dataStore))
         )[LoginViewModel::class.java]
 
-        loginViewModel.getUser().observe(this, { user ->
+        loginViewModel.getUser().observe(this) { user ->
             this.user = user
-        })
+        }
     }
 
     private fun setupAction() {
@@ -83,7 +87,8 @@ class LoginActivity : AppCompatActivity() {
                         setMessage("Anda berhasil login. Sudah tidak sabar untuk belajar ya?")
                         setPositiveButton("Lanjut") { _, _ ->
                             val intent = Intent(context, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                             startActivity(intent)
                             finish()
                         }
@@ -92,6 +97,50 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun playAnimation() {
+        binding.apply {
+            titleTextView.alpha = 0F
+            messageTextView.alpha = 0F
+            emailTextView.alpha = 0F
+            emailEditTextLayout.alpha = 0F
+            passwordTextView.alpha = 0F
+            passwordEditTextLayout.alpha = 0F
+            loginButton.alpha = 0F
+        }
+
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30F, 30F).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val title = alphaAnim(binding.titleTextView)
+        val message = alphaAnim(binding.messageTextView)
+        val email = alphaAnim(binding.emailTextView)
+        val emailInput = alphaAnim(binding.emailEditTextLayout)
+        val password = alphaAnim(binding.passwordTextView)
+        val passwordInput = alphaAnim(binding.passwordEditTextLayout)
+        val loginButton = alphaAnim(binding.loginButton)
+
+        AnimatorSet().apply {
+            playSequentially(
+                title,
+                message,
+                email,
+                emailInput,
+                password,
+                passwordInput,
+                loginButton
+            )
+        }.start()
+    }
+
+    private fun alphaAnim(target: View): ObjectAnimator {
+        return ObjectAnimator.ofFloat(target, View.ALPHA, 1F).apply {
+            duration = 500
         }
     }
 

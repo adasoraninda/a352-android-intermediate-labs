@@ -1,9 +1,12 @@
 package com.dicoding.picodiploma.loginwithanimation.view.main
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +34,30 @@ class MainActivity : AppCompatActivity() {
         setupView()
         setupViewModel()
         setupAction()
+        playAnimation()
+    }
+
+    private fun playAnimation() {
+        binding.apply {
+            nameTextView.alpha = 0F
+            messageTextView.alpha = 0F
+            logoutButton.alpha = 0F
+        }
+
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30F, 30F).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
+
+        val name = alphaAnim(binding.nameTextView)
+        val message = alphaAnim(binding.messageTextView)
+        val logoutButton = alphaAnim(binding.logoutButton)
+
+        AnimatorSet().apply {
+            startDelay = 500
+            playSequentially(name, message, logoutButton)
+        }.start()
     }
 
     private fun setupView() {
@@ -53,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         )[MainViewModel::class.java]
 
         mainViewModel.getUser().observe(this, { user ->
-            if (user.isLogin){
+            if (user.isLogin) {
                 binding.nameTextView.text = getString(R.string.greeting, user.name)
             } else {
                 startActivity(Intent(this, WelcomeActivity::class.java))
@@ -65,6 +92,12 @@ class MainActivity : AppCompatActivity() {
     private fun setupAction() {
         binding.logoutButton.setOnClickListener {
             mainViewModel.logout()
+        }
+    }
+
+    private fun alphaAnim(target: View): ObjectAnimator {
+        return ObjectAnimator.ofFloat(target, View.ALPHA, 1F).apply {
+            duration = 500
         }
     }
 }

@@ -1,8 +1,11 @@
 package com.dicoding.picodiploma.loginwithanimation.view.signup
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
@@ -30,6 +33,7 @@ class SignupActivity : AppCompatActivity() {
         setupView()
         setupViewModel()
         setupAction()
+        playAnimation()
     }
 
     private fun setupView() {
@@ -80,6 +84,48 @@ class SignupActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun playAnimation() {
+        binding.apply {
+            titleTextView.alpha = 0F
+            nameTextView.alpha = 0F
+            nameEditTextLayout.alpha = 0F
+            emailTextView.alpha = 0F
+            emailEditTextLayout.alpha = 0F
+            passwordTextView.alpha = 0F
+            passwordEditTextLayout.alpha = 0F
+            signupButton.alpha = 0F
+        }
+
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30F, 30F).apply {
+            duration = 6000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+            start()
+        }
+
+        val title = alphaAnim(binding.titleTextView)
+        val name = alphaAnim(binding.nameTextView)
+        val nameInput = alphaAnim(binding.nameEditTextLayout)
+        val email = alphaAnim(binding.emailTextView)
+        val emailInput = alphaAnim(binding.emailEditTextLayout)
+        val password = alphaAnim(binding.passwordTextView)
+        val passwordInput = alphaAnim(binding.passwordEditTextLayout)
+        val signupButton = alphaAnim(binding.signupButton)
+
+        AnimatorSet().apply {
+            startDelay = 500
+            playSequentially(
+                title, name, nameInput, email, emailInput, password, passwordInput, signupButton
+            )
+        }.start()
+    }
+
+    private fun alphaAnim(target: View): ObjectAnimator {
+        return ObjectAnimator.ofFloat(target, View.ALPHA, 1F).apply {
+            duration = 500
         }
     }
 }
